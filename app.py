@@ -62,12 +62,12 @@ rakhi_catalog = {
 rakhi_catalog = dict(sorted(rakhi_catalog.items(), key=lambda x: -x[1]['discount']))
 
 # Streamlit Setup
-st.set_page_config(page_title="Rakhi Store", layout="wide")
+st.set_page_config(page_title="Bandhan 24", layout="wide")
 
 # Login
 if "user_phone" not in st.session_state:
     with st.form("login_form"):
-        st.title("🔐 Login to Rakhi Store")
+        st.title("🔐 Login to Bandhan 24")
         user_phone = st.text_input("Enter your phone number")
         login_submit = st.form_submit_button("Login")
     if login_submit:
