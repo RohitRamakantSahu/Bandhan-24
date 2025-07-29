@@ -138,7 +138,7 @@ st.set_page_config(page_title="Saaurabh Collections", layout="wide")
 
 if "user_phone" not in st.session_state:
     with st.form("login_form"):
-        st.title("🔐 Login to Saaurabh Collections")
+        st.title("🔐 Login to SAURABH COLLECTIONS")
         user_phone = st.text_input("Enter your phone number")
         login_submit = st.form_submit_button("Login")
     if login_submit:
