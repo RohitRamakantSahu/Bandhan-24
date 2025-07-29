@@ -6,9 +6,8 @@ from datetime import datetime
 import urllib.parse
 
 CSV_FILE = "orders.csv"
-YOUR_PHONE = "919140939949"  # Your WhatsApp number
+YOUR_PHONE = ""  # Your WhatsApp number
 
-# Initialize CSV with updated columns
 def initialize_csv():
     if not os.path.exists(CSV_FILE):
         df = pd.DataFrame(columns=[
@@ -17,7 +16,6 @@ def initialize_csv():
         ])
         df.to_csv(CSV_FILE, index=False)
 
-# Save orders
 def save_orders_to_csv(order_rows):
     initialize_csv()
     df_existing = pd.read_csv(CSV_FILE, dtype={"Phone": str})
@@ -25,7 +23,6 @@ def save_orders_to_csv(order_rows):
     df_combined = pd.concat([df_existing, df_new], ignore_index=True)
     df_combined.to_csv(CSV_FILE, index=False)
 
-# Product Catalog
 rakhi_catalog = {
     "IMG_20250707_221915": {
         "title": "Elegant Thread Rakhi",
@@ -61,13 +58,11 @@ rakhi_catalog = {
 
 rakhi_catalog = dict(sorted(rakhi_catalog.items(), key=lambda x: -x[1]['discount']))
 
-# Streamlit Setup
-st.set_page_config(page_title="Bandhan 24", layout="wide")
+st.set_page_config(page_title="Saaurabh Collections", layout="wide")
 
-# Login
 if "user_phone" not in st.session_state:
     with st.form("login_form"):
-        st.title("🔐 Login to Bandhan 24")
+        st.title("🔐 Login to Saaurabh Collections")
         user_phone = st.text_input("Enter your phone number")
         login_submit = st.form_submit_button("Login")
     if login_submit:
@@ -78,7 +73,6 @@ if "user_phone" not in st.session_state:
             st.warning("📱 Please enter a valid phone number.")
     st.stop()
 
-# Sidebar
 st.sidebar.markdown(f"📱 Logged in as: `{st.session_state.user_phone}`")
 if st.sidebar.button("🔓 Logout"):
     st.session_state.clear()
@@ -86,19 +80,17 @@ if st.sidebar.button("🔓 Logout"):
 
 selected_tab = st.sidebar.radio("Navigate", ["🛍️ Shop", "📦 My Orders"])
 
-# Cart
 if "cart" not in st.session_state:
     st.session_state.cart = {}
 
-# SHOP TAB
 if selected_tab == "🛍️ Shop":
-    st.title("🛍️ Rakhi Shop")
+    st.title("🛍️ Saaurabh Collections")
     cols = st.columns(3)
 
     for i, (key, item) in enumerate(rakhi_catalog.items()):
         with cols[i % 3]:
             final_price = int(item["price"] * (1 - item["discount"] / 100))
-            st.image(item["image"], use_column_width=True)
+            st.image(item["image"], use_column_width=True)  # ✅ Use backward-compatible option
             st.markdown(f"**{item['title']}**")
             st.markdown(f"~~₹{item['price']}~~ 🎉 **{item['discount']}% OFF** → ₹{final_price}")
             qty = st.number_input(f"Qty for {key}", min_value=1, max_value=10, value=1, key=f"qty_{key}")
@@ -113,7 +105,6 @@ if selected_tab == "🛍️ Shop":
                     }
                 st.success(f"Added {qty} x {item['title']} to cart")
 
-    # Checkout Section
     if st.session_state.cart:
         st.markdown("---")
         st.header("🧾 Your Cart")
@@ -157,7 +148,6 @@ if selected_tab == "🛍️ Shop":
 
                 save_orders_to_csv(orders)
 
-                # WhatsApp message
                 msg = f"*Order ID:* {order_id}\n*Name:* {name}\n*Phone:* {phone_number}\n*Pincode:* {pincode}\n*Address:* {address}\n"
                 if reference_by:
                     msg += f"*Reference By:* {reference_by}\n"
@@ -172,7 +162,6 @@ if selected_tab == "🛍️ Shop":
     else:
         st.info("🛒 Your cart is empty.")
 
-# MY ORDERS TAB
 elif selected_tab == "📦 My Orders":
     st.title("📦 Your Orders")
 
