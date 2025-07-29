@@ -24,6 +24,7 @@ def save_orders_to_csv(order_rows):
     df_combined.to_csv(CSV_FILE, index=False)
 
 rakhi_catalog = {
+    # Previous products
     "IMG_20250707_221915": {
         "title": "Elegant Thread Rakhi",
         "price": 120,
@@ -54,8 +55,83 @@ rakhi_catalog = {
         "discount": 20,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753726762/IMG_20250707_222554.jpg"
     },
+
+    # New uploads (dated 2025-07-29)
+    "IMG_20250729_114338_1": {
+        "title": "Golden Stone Rakhi",
+        "price": 150,
+        "discount": 25,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777815/WhatsApp%20Image%202025-07-29%20at%2011.43.38_6a4f12e0.jpg"
+    },
+    "IMG_20250729_114339_1": {
+        "title": "Rustic Charm Rakhi",
+        "price": 130,
+        "discount": 15,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777816/WhatsApp%20Image%202025-07-29%20at%2011.43.39_2f92630f.jpg"
+    },
+    "IMG_20250729_114339_2": {
+        "title": "Twin Pearl Rakhi",
+        "price": 110,
+        "discount": 20,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777817/WhatsApp%20Image%202025-07-29%20at%2011.43.39_032298f3.jpg"
+    },
+    "IMG_20250729_114338_2": {
+        "title": "Red Feather Rakhi",
+        "price": 140,
+        "discount": 18,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777818/WhatsApp%20Image%202025-07-29%20at%2011.43.38_a3cbeee5.jpg"
+    },
+    "IMG_20250729_114339_3": {
+        "title": "Antique Emblem Rakhi",
+        "price": 135,
+        "discount": 22,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777819/WhatsApp%20Image%202025-07-29%20at%2011.43.39_a760ab12.jpg"
+    },
+    "IMG_20250729_114340_1": {
+        "title": "Threaded Diamond Rakhi",
+        "price": 160,
+        "discount": 28,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777820/WhatsApp%20Image%202025-07-29%20at%2011.43.40_5451bc86.jpg"
+    },
+    "IMG_20250729_114340_2": {
+        "title": "Zari Pearl Rakhi",
+        "price": 115,
+        "discount": 12,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777821/WhatsApp%20Image%202025-07-29%20at%2011.43.40_29d3c9dc.jpg"
+    },
+    "IMG_20250729_114341_1": {
+        "title": "Elegant Floral Rakhi",
+        "price": 125,
+        "discount": 15,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777822/WhatsApp%20Image%202025-07-29%20at%2011.43.41_c90ca9c0.jpg"
+    },
+    "IMG_20250729_114340_3": {
+        "title": "Red Gemstone Rakhi",
+        "price": 145,
+        "discount": 18,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777823/WhatsApp%20Image%202025-07-29%20at%2011.43.40_90609f14.jpg"
+    },
+    "IMG_20250729_114341_2": {
+        "title": "Classic Rudraksha Rakhi",
+        "price": 95,
+        "discount": 10,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777824/WhatsApp%20Image%202025-07-29%20at%2011.43.41_50feea60.jpg"
+    },
+    "IMG_20250729_114342_1": {
+        "title": "Minimal Designer Rakhi",
+        "price": 105,
+        "discount": 15,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777825/WhatsApp%20Image%202025-07-29%20at%2011.43.42_ab1eb195.jpg"
+    },
+    "IMG_20250729_114342_2": {
+        "title": "Silver Stone Rakhi",
+        "price": 135,
+        "discount": 20,
+        "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777826/WhatsApp%20Image%202025-07-29%20at%2011.43.42_ea071a48.jpg"
+    },
 }
 
+# Sort by discount descending
 rakhi_catalog = dict(sorted(rakhi_catalog.items(), key=lambda x: -x[1]['discount']))
 
 st.set_page_config(page_title="Saaurabh Collections", layout="wide")
