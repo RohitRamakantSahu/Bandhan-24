@@ -6,7 +6,7 @@ from datetime import datetime
 import urllib.parse
 
 CSV_FILE = "orders.csv"
-YOUR_PHONE = " 9140939949"  # Your WhatsApp number
+YOUR_PHONE = "9140939949"  # Your WhatsApp number
 
 def initialize_csv():
     if not os.path.exists(CSV_FILE):
