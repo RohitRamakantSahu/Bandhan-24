@@ -1,58 +1,72 @@
 import streamlit as st
 import pandas as pd
-import os
 import uuid
 from datetime import datetime
 import urllib.parse
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
-CSV_FILE = "orders.csv"
-YOUR_PHONE = "9140939949"  # Your WhatsApp number
+# Your WhatsApp number
+YOUR_PHONE = "9140939949"
 
-def initialize_csv():
-    if not os.path.exists(CSV_FILE):
-        df = pd.DataFrame(columns=[
-            "Order ID", "Product", "Quantity", "Unit Price", "Subtotal",
-            "Name", "Phone", "Address", "Pincode", "Reference By", "Timestamp"
-        ])
-        df.to_csv(CSV_FILE, index=False)
+# Google Sheets Setup
+SHEET_ID = "1wEGbmN9XsjsM_UB_4QGnNODNUurPVlQO7KNh8Jb4i-A"
+SHEET_NAME = "Orders"
 
-def save_orders_to_csv(order_rows):
-    initialize_csv()
-    df_existing = pd.read_csv(CSV_FILE, dtype={"Phone": str})
-    df_new = pd.DataFrame(order_rows)
-    df_combined = pd.concat([df_existing, df_new], ignore_index=True)
-    df_combined.to_csv(CSV_FILE, index=False)
+def save_orders_to_sheet(order_rows):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("google-creds.json", scope)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(SHEET_ID).worksheet(SHEET_NAME)
 
+    # Add header if sheet is empty
+    if not sheet.get_all_values():
+        sheet.append_row(list(order_rows[0].keys()))
+
+    for row in order_rows:
+        sheet.append_row(list(row.values()))
+
+def get_user_orders(phone_number):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("google-creds.json", scope)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(SHEET_ID).worksheet(SHEET_NAME)
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+    df["Phone"] = df["Phone"].astype(str).str.strip()
+    return df[df["Phone"] == phone_number]
+
+# Product Catalog
 rakhi_catalog = {
     # Previous products
     "IMG_20250707_221915": {
         "title": "Elegant Thread Rakhi",
         "price": 120,
-        "discount": 30,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753726754/IMG_20250707_221915.jpg"
     },
     "IMG_20250707_222238": {
         "title": "Traditional Beads Rakhi",
         "price": 120,
-        "discount": 10,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753726756/IMG_20250707_222238.jpg"
     },
     "IMG_20250707_222103": {
         "title": "Simple Grace Rakhi",
         "price": 80,
-        "discount": 10,
+        "discount": 20,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753726757/IMG_20250707_222103.jpg"
     },
     "IMG_20250707_222735": {
         "title": "Royal Red Rakhi",
         "price": 80,
-        "discount": 10,
+        "discount": 20,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753726761/IMG_20250707_222735.jpg"
     },
     "IMG_20250707_222554": {
         "title": "Pearl Designer Rakhi",
         "price": 120,
-        "discount": 20,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753726762/IMG_20250707_222554.jpg"
     },
 
@@ -60,85 +74,84 @@ rakhi_catalog = {
     "IMG_20250729_114338_1": {
         "title": "Golden Stone Rakhi",
         "price": 150,
-        "discount": 25,
+        "discount": 45,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777815/WhatsApp%20Image%202025-07-29%20at%2011.43.38_6a4f12e0.jpg"
     },
     "IMG_20250729_114339_1": {
         "title": "Rustic Charm Rakhi",
         "price": 130,
-        "discount": 15,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777816/WhatsApp%20Image%202025-07-29%20at%2011.43.39_2f92630f.jpg"
     },
     "IMG_20250729_114339_2": {
         "title": "Twin Pearl Rakhi",
         "price": 110,
-        "discount": 20,
+        "discount": 30,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777817/WhatsApp%20Image%202025-07-29%20at%2011.43.39_032298f3.jpg"
     },
     "IMG_20250729_114338_2": {
         "title": "Red Feather Rakhi",
         "price": 140,
-        "discount": 18,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777818/WhatsApp%20Image%202025-07-29%20at%2011.43.38_a3cbeee5.jpg"
     },
     "IMG_20250729_114339_3": {
         "title": "Antique Emblem Rakhi",
         "price": 135,
-        "discount": 22,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777819/WhatsApp%20Image%202025-07-29%20at%2011.43.39_a760ab12.jpg"
     },
     "IMG_20250729_114340_1": {
         "title": "Threaded Diamond Rakhi",
         "price": 160,
-        "discount": 28,
+        "discount": 50,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777820/WhatsApp%20Image%202025-07-29%20at%2011.43.40_5451bc86.jpg"
     },
     "IMG_20250729_114340_2": {
         "title": "Zari Pearl Rakhi",
         "price": 115,
-        "discount": 12,
+        "discount": 30,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777821/WhatsApp%20Image%202025-07-29%20at%2011.43.40_29d3c9dc.jpg"
     },
     "IMG_20250729_114341_1": {
         "title": "Elegant Floral Rakhi",
         "price": 125,
-        "discount": 15,
+        "discount": 30,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777822/WhatsApp%20Image%202025-07-29%20at%2011.43.41_c90ca9c0.jpg"
     },
     "IMG_20250729_114340_3": {
         "title": "Red Gemstone Rakhi",
         "price": 145,
-        "discount": 18,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777823/WhatsApp%20Image%202025-07-29%20at%2011.43.40_90609f14.jpg"
     },
     "IMG_20250729_114341_2": {
         "title": "Classic Rudraksha Rakhi",
         "price": 95,
-        "discount": 10,
+        "discount": 20,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777824/WhatsApp%20Image%202025-07-29%20at%2011.43.41_50feea60.jpg"
     },
     "IMG_20250729_114342_1": {
         "title": "Minimal Designer Rakhi",
         "price": 105,
-        "discount": 15,
+        "discount": 25,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777825/WhatsApp%20Image%202025-07-29%20at%2011.43.42_ab1eb195.jpg"
     },
     "IMG_20250729_114342_2": {
         "title": "Silver Stone Rakhi",
         "price": 135,
-        "discount": 20,
+        "discount": 40,
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777826/WhatsApp%20Image%202025-07-29%20at%2011.43.42_ea071a48.jpg"
     },
 }
 
-# Sort by discount descending
 rakhi_catalog = dict(sorted(rakhi_catalog.items(), key=lambda x: -x[1]['discount']))
 
 st.set_page_config(page_title="Saaurabh Collections", layout="wide")
 
 if "user_phone" not in st.session_state:
     with st.form("login_form"):
-        st.title("🔐 Login to SAURABH COLLECTIONS")
+        st.title("🔐 Login to Saaurabh Collections")
         user_phone = st.text_input("Enter your phone number")
         login_submit = st.form_submit_button("Login")
     if login_submit:
@@ -166,7 +179,7 @@ if selected_tab == "🛍️ Shop":
     for i, (key, item) in enumerate(rakhi_catalog.items()):
         with cols[i % 3]:
             final_price = int(item["price"] * (1 - item["discount"] / 100))
-            st.image(item["image"], use_column_width=True)  # ✅ Use backward-compatible option
+            st.image(item["image"], use_column_width=True)
             st.markdown(f"**{item['title']}**")
             st.markdown(f"~~₹{item['price']}~~ 🎉 **{item['discount']}% OFF** → ₹{final_price}")
             qty = st.number_input(f"Qty for {key}", min_value=1, max_value=10, value=1, key=f"qty_{key}")
@@ -222,7 +235,7 @@ if selected_tab == "🛍️ Shop":
                         "Timestamp": timestamp
                     })
 
-                save_orders_to_csv(orders)
+                save_orders_to_sheet(orders)
 
                 msg = f"*Order ID:* {order_id}\n*Name:* {name}\n*Phone:* {phone_number}\n*Pincode:* {pincode}\n*Address:* {address}\n"
                 if reference_by:
@@ -240,12 +253,8 @@ if selected_tab == "🛍️ Shop":
 
 elif selected_tab == "📦 My Orders":
     st.title("📦 Your Orders")
-
-    initialize_csv()
-    df_all = pd.read_csv(CSV_FILE, dtype={"Phone": str})
-    df_all["Phone"] = df_all["Phone"].astype(str).str.strip()
-    user_phone = str(st.session_state.user_phone).strip()
-    df = df_all[df_all["Phone"] == user_phone]
+    phone = str(st.session_state.user_phone).strip()
+    df = get_user_orders(phone)
 
     if df.empty:
         st.info("No orders found.")
