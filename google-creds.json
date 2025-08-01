@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "aerobic-bonus-454706-p3",
+  "private_key_id": "089b9470ac37170873d7dc3bd8c04b5cb5e62eac",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC5MZT+6HHL4X5d\ndIwgg1dhENJLr7Aq84sFozfnF+KzNJi57dtpU49Ld8ERiwZ6TV7l5gTBHNIFf336\nBxVKBXvwDQxmkIj9L76kkfKP9R7EMohsdWoEF+ZPF9x38zHqoSstsidQc1ToTMzv\nNX9Li8xrwQ/qxQGPbPXuvuWO7iZVedbO3w0A2eRXGo+M/jaoQWByD6KdvYWRPl3u\nsN0GgRo+UXB3rMtj+MCXwDXoplo+yTONli3r0OwZL8hQ57JliF/iDlLr1h0yANnZ\ndE+irv6YpmprO8ZfIAifhQsiFU+p0EnXDOwUNJi0ndLFGFPSudPdqPBIb8CFi2w8\n/pASEYcVAgMBAAECggEARstidtOq9NJ9uQIdsywiUhPZIF/IC5NQWNZdP3VND06S\n97iqwKfVxnbAEpG/5y7+kQoOVThMPRfQs6zTgZl5GHoUfHzSMV94FHdKb6e3nC7p\nIfT8kxYDz8aCXERWl6gG1pAdIU8FbUw2p1cfE2UcvzBtgkTPZOG1XhARt0Lo2pFz\nZEebppup1ncFlKi15mZtBSzBTBckehPTFJUCWY47o3fMqo7o1IBPp0XjbRPWmPBK\nP4zs2/QByN3MBCcUSh10jquZzvrgem6UtlkVuXuanF9+YTCxk74LI2yCGCXav3hj\nw0HWhwo34zNQVvKb5kbZn+mA4nOI1U7rXSUu2aaO3QKBgQDi4rnURFDuB4yO/BuZ\nHhESOw5QCuefBHRVkF4vAdoGqcDDy2neXqHDTczoYDX9GP8ZX+bJkr0TvdtQr3HU\nKYfi5RmbFvPDlU2merLhNbm7dI2BExwpcPPjjdHBryaGsLVX6INDPyORkDQF9bg0\nZ3IWQdcxOorc3tSlcrNkaYD9JwKBgQDQ9UKZnUOA6TWSf06D69orvgW4ygfPtbCr\nTk9WzIRxzoJD6S1hsymZFPZ5P1Ly1pvU65IaH4oYK+vP8sRKEQa0TxQ/OpSNnC2i\no2on4fRki4QauPOiutwdsmr/QdLuUVlyv2zQudZVop4vFlzf9uAgssS1tHgaGJwu\neZqjevn3YwKBgQDK7AtWTU+wxLGzRMqONPUBwC356vbkI4DE8l06X8aXhQXyWCE1\nEKBPZGsrPrmqx8uI71wj1wki+gCIdpIxNn/hsBQpwOp+eC++ASmyAXI/tWvGEMh0\nTCDl2fbL6xJjDvLyT/Puli8Cxt2woueAfzDrtTF5Rynhh67a1u6ZlT8XqwKBgQDN\nUSAmpnLsmLmN/88bKsTNlEI1BzZTrpgwSpsEk6JT3PD8X4K66/sksodYLZOIjrzB\notKFHpZnF8j2I/khOceXpdgkJKBQ4LOqid1F4OxtWvTr+O1T6T1dZLFjrL7gckhs\nypDWKrPiow3BAL0zR3WES4OjcvdL1QCpXc1Hcw9oNwKBgQCeRIR+7zu31LOK55C8\n9dDgJbNnehDCXQUNU0r1BlBRhxRj21Sa6+Qj19yPYgeI+o29UHjYL5RZpokL06Y/\nPF82tZh8RubLLwUu0cOgJyUTZVDg1ASSshQMp15Y2SXmURdjlCUhIWnDn2rUYnqY\n6fKRw6QaJsCoUaGwoD4i/DUNUA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-analytics@aerobic-bonus-454706-p3.iam.gserviceaccount.com",
+  "client_id": "117839811060605529559",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-analytics%40aerobic-bonus-454706-p3.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
