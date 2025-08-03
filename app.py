@@ -1,42 +1,102 @@
+# app.py
+import os, json, base64
 import streamlit as st
 import pandas as pd
 import uuid
 from datetime import datetime
 import urllib.parse
+
+from dotenv import load_dotenv; load_dotenv()
+
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# Your WhatsApp number
-YOUR_PHONE = "9140939949"
+# -------------------------------
+# Config / Secrets
+# -------------------------------
+SCOPE = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive",
+]
 
-# Google Sheets Setup
-SHEET_ID = "1wEGbmN9XsjsM_UB_4QGnNODNUurPVlQO7KNh8Jb4i-A"
-SHEET_NAME = "Orders"
+def _get_service_account_info() -> dict:
+    """Resolve Google service-account JSON from Streamlit Secrets or env."""
+    # 1) Preferred: TOML table in Streamlit secrets
+    if "google_credentials" in st.secrets:
+        return dict(st.secrets["google_credentials"])
 
+    # 2) Base64 single-line secret (works in Streamlit or locally via .env)
+    b64 = st.secrets.get("GOOGLE_CREDS_B64", None) if hasattr(st, "secrets") else None
+    b64 = b64 or os.getenv("GOOGLE_CREDS_B64")
+    if b64:
+        return json.loads(base64.b64decode(b64).decode("utf-8"))
+
+    # 3) Raw JSON string in env (local only)
+    raw = os.getenv("GOOGLE_CREDS_JSON")
+    if raw:
+        return json.loads(raw)
+
+    # 4) Final fallback: local file (dev only)
+    if os.path.exists("google-creds.json"):
+        with open("google-creds.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    raise RuntimeError(
+        "No Google credentials found. Add [google_credentials] in Streamlit secrets "
+        "or set GOOGLE_CREDS_B64 / GOOGLE_CREDS_JSON / google-creds.json."
+        )
+
+def _get_gspread_client():
+    info = _get_service_account_info()
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(info, SCOPE)
+    return gspread.authorize(creds)
+
+def _get_worksheet(client, sheet_id: str, sheet_name: str):
+    """Open worksheet by name; create if missing."""
+    sh = client.open_by_key(sheet_id)
+    try:
+        ws = sh.worksheet(sheet_name)
+    except gspread.WorksheetNotFound:
+        ws = sh.add_worksheet(title=sheet_name, rows=100, cols=20)
+    return ws
+
+# Read simple config from secrets/env (with sensible defaults)
+YOUR_PHONE = st.secrets.get("YOUR_PHONE", os.getenv("YOUR_PHONE", "9140939949"))
+SHEET_ID = st.secrets.get("SHEET_ID", os.getenv("SHEET_ID"))
+SHEET_NAME = st.secrets.get("SHEET_NAME", os.getenv("SHEET_NAME", "Orders"))
+
+if not SHEET_ID:
+    st.error("SHEET_ID is missing. Add it to Streamlit secrets or .env.")
+    st.stop()
+
+# -------------------------------
+# Google Sheets helpers
+# -------------------------------
 def save_orders_to_sheet(order_rows):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("google-creds.json", scope)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_key(SHEET_ID).worksheet(SHEET_NAME)
+    client = _get_gspread_client()
+    sheet = _get_worksheet(client, SHEET_ID, SHEET_NAME)
 
-    # Add header if sheet is empty
+    # Add header if empty
     if not sheet.get_all_values():
         sheet.append_row(list(order_rows[0].keys()))
 
+    # Append rows
     for row in order_rows:
         sheet.append_row(list(row.values()))
 
 def get_user_orders(phone_number):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("google-creds.json", scope)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_key(SHEET_ID).worksheet(SHEET_NAME)
+    client = _get_gspread_client()
+    sheet = _get_worksheet(client, SHEET_ID, SHEET_NAME)
     data = sheet.get_all_records()
+    if not data:
+        return pd.DataFrame(columns=["Order ID","Product","Quantity","Unit Price","Subtotal","Name","Phone","Address","Pincode","Reference By","Timestamp"])
     df = pd.DataFrame(data)
     df["Phone"] = df["Phone"].astype(str).str.strip()
-    return df[df["Phone"] == phone_number]
+    return df[df["Phone"] == str(phone_number).strip()]
 
-# Product Catalog
+# -------------------------------
+# Product Catalog (unchanged)
+# -------------------------------
 rakhi_catalog = {
     # Previous products
     "IMG_20250707_221915": {
@@ -144,11 +204,14 @@ rakhi_catalog = {
         "image": "https://res.cloudinary.com/dx35lfv49/image/upload/v1753777826/WhatsApp%20Image%202025-07-29%20at%2011.43.42_ea071a48.jpg"
     },
 }
+rakhi_catalog = dict(sorted(rakhi_catalog.items(), key=lambda x: -x[1]["discount"]))
 
-rakhi_catalog = dict(sorted(rakhi_catalog.items(), key=lambda x: -x[1]['discount']))
-
+# -------------------------------
+# UI
+# -------------------------------
 st.set_page_config(page_title="Saaurabh Collections", layout="wide")
 
+# Simple login with phone
 if "user_phone" not in st.session_state:
     with st.form("login_form"):
         st.title("🔐 Login to Saaurabh Collections")
@@ -183,7 +246,7 @@ if selected_tab == "🛍️ Shop":
             st.markdown(f"**{item['title']}**")
             st.markdown(f"~~₹{item['price']}~~ 🎉 **{item['discount']}% OFF** → ₹{final_price}")
             qty = st.number_input(f"Qty for {key}", min_value=1, max_value=10, value=1, key=f"qty_{key}")
-            if st.button(f"🛒 Add to Cart", key=f"add_{key}"):
+            if st.button("🛒 Add to Cart", key=f"add_{key}"):
                 if key in st.session_state.cart:
                     st.session_state.cart[key]["quantity"] += qty
                 else:
@@ -264,7 +327,8 @@ elif selected_tab == "📦 My Orders":
         for oid, group in grouped:
             st.markdown(f"### 🧾 Order ID: `{oid}`")
             st.markdown(
-                f"**Name:** {group.iloc[0]['Name']} | **Pincode:** {group.iloc[0]['Pincode']} | **Address:** {group.iloc[0]['Address']}")
-            if group.iloc[0]["Reference By"]:
+                f"**Name:** {group.iloc[0]['Name']} | **Pincode:** {group.iloc[0]['Pincode']} | **Address:** {group.iloc[0]['Address']}"
+            )
+            if str(group.iloc[0].get("Reference By", "")).strip():
                 st.markdown(f"**Reference By:** {group.iloc[0]['Reference By']}")
             st.write(group[["Product", "Quantity", "Unit Price", "Subtotal", "Timestamp"]])
